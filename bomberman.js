@@ -3,14 +3,70 @@ namespace SpriteKind {
 }
 
 class ArmedBomb {
+  public static readonly smallBombImage = img`
+          . . . . . . . . 2 2 . . . . . .
+          . . . . . . . c 4 4 . . . . . .
+          . . . c c c c c 4 c f f . . . .
+          . . c c f f f c c c c f f f . .
+          . . c f f f f c c f c d c f . .
+          . c c f f f f f f f c d d f f .
+          . c f f f f f f f f f c c f f .
+          . c f f f f f f f f f f f f f .
+          . c f f f f f f f f f f f f f .
+          . c f f f f f f f f f f f f f .
+          . c f f f f f f f f f f f f f .
+          . c c f f f f f f f f f f c . .
+          . . c c f f f f f f f f c f . .
+          . . . c c f f f f f c c c . . .
+          . . . . . c c c c c f . . . . .
+          . . . . . . . . . . . . . . . .
+  `
+  public static readonly largeBombImage = img`
+      . . . . . . . . 2 2 . . . . . .
+      . . . . . . . c 4 4 . . . . . .
+      . . . c c c c c 4 c f f . . . .
+      . . c c f f f c c c c f f f . .
+      . . c f f f f c c f c d c f . .
+      . c c f f f f f f f c d d f f .
+      . c f f f f f f f f f c c f f .
+      . c f f f f f f f f f f f f f .
+      . c f f f f f f f f f f f f f .
+      . c f f f f f f f f f f f f f .
+      . c f f f f f f f f f f f f f .
+      . c c f f f f f f f f f f c . .
+      . . c c f f f f f f f f c f . .
+      . . . c c f f f f f c c c . . .
+      . . . . . c c c c c f . . . . .
+      . . . . . . . . . . . . . . . .
+  `
     bomb: Sprite
     countDown: number
     status: string
+    currentImage: string
 
     constructor(bomb: Sprite) {
         this.bomb = bomb
         this.countDown = 3000
         this.status = 'armed'
+        this.currentImage = 'large'
+
+    }
+
+    tick() {
+      this.decreaseCountdown(10)
+      if (this.countDown % 100 == 0) {
+        this.switchImage()
+      }
+    }
+
+    switchImage() {
+      if (this.currentImage == 'large') {
+        this.currentImage = 'small'
+        this.bomb.setImage(ArmedBomb.smallBombImage)
+      } else {
+        this.currentImage = 'large'
+        this.bomb.setImage(ArmedBomb.largeBombImage)
+      }
     }
 
     decreaseCountdown(decrease: number) {
@@ -33,33 +89,16 @@ let hero: Sprite = null
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     if (nbAvailableBombs > 0) {
         nbAvailableBombs = nbAvailableBombs - 1
-        let bomb = sprites.create(img`
-          . . . . . . . . 2 2 . . . . . .
-          . . . . . . . c 4 4 . . . . . .
-          . . . c c c c c 4 c f f . . . .
-          . . c c f f f c c c c f f f . .
-          . . c f f f f c c f c d c f . .
-          . c c f f f f f f f c d d f f .
-          . c f f f f f f f f f c c f f .
-          . c f f f f f f f f f f f f f .
-          . c f f f f f f f f f f f f f .
-          . c f f f f f f f f f f f f f .
-          . c f f f f f f f f f f f f f .
-          . c c f f f f f f f f f f c . .
-          . . c c f f f f f f f f c f . .
-          . . . c c f f f f f c c c . . .
-          . . . . . c c c c c f . . . . .
-          . . . . . . . . . . . . . . . .
-        `, SpriteKind.Bomb)
+        let bomb = sprites.create(ArmedBomb.largeBombImage, SpriteKind.Bomb)
         let armedBomb = new ArmedBomb(bomb);
         bombs.insertAt(0, armedBomb)
     }
 })
 
-game.onUpdateInterval(100, function () {
+game.onUpdateInterval(10, function () {
     for (let i = 0; i < bombs.length; i++) {
         let armedBomb = bombs[i]
-        armedBomb.decreaseCountdown(100)
+        armedBomb.tick()
         if (armedBomb.hasExploded()) {
             bombs.removeAt(i)
             nbAvailableBombs = nbAvailableBombs + 1
