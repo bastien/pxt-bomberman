@@ -90,5 +90,5 @@ hero = sprites.create(img`
     . . . . . f f f f f f . . . . .
     . . . . . f f . . f f . . . . .
 `, SpriteKind.Player)
-controller.moveSprite(hero, 100, 100)
+controller.moveSprite(hero, 200, 200)
 nbAvailableBombs = 2
