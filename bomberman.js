@@ -68,6 +68,7 @@ game.onUpdateInterval(100, function () {
 })
 sprites.onCreated(SpriteKind.Bomb, function (sprite) {
     sprite.setPosition(hero.x, hero.y)
+    sprite.z = hero.z - 1
 })
 
 scene.setBackgroundColor(6)
