@@ -34,22 +34,22 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     if (nbAvailableBombs > 0) {
         nbAvailableBombs = nbAvailableBombs - 1
         let bomb = sprites.create(img`
-            . . . . . . . e c 7 . . . . . .
-            . . . . e e e c 7 7 e e . . . .
-            . . c e e e e c 7 e 2 2 e e . .
-            . c e e e e e c 6 e e 2 2 2 e .
-            . c e e e 2 e c c 2 4 5 4 2 e .
-            c e e e 2 2 2 2 2 2 4 5 5 2 2 e
-            c e e 2 2 2 2 2 2 2 2 4 4 2 2 e
-            c e e 2 2 2 2 2 2 2 2 2 2 2 2 e
-            c e e 2 2 2 2 2 2 2 2 2 2 2 2 e
-            c e e 2 2 2 2 2 2 2 2 2 2 2 2 e
-            c e e 2 2 2 2 2 2 2 2 2 2 4 2 e
-            . e e e 2 2 2 2 2 2 2 2 2 4 e .
-            . 2 e e 2 2 2 2 2 2 2 2 4 2 e .
-            . . 2 e e 2 2 2 2 2 4 4 2 e . .
-            . . . 2 2 e e 4 4 4 2 e e . . .
-            . . . . . 2 2 e e e e . . . . .
+          . . . . . . . . 2 2 . . . . . .
+          . . . . . . . c 4 4 . . . . . .
+          . . . c c c c c 4 c f f . . . .
+          . . c c f f f c c c c f f f . .
+          . . c f f f f c c f c d c f . .
+          . c c f f f f f f f c d d f f .
+          . c f f f f f f f f f c c f f .
+          . c f f f f f f f f f f f f f .
+          . c f f f f f f f f f f f f f .
+          . c f f f f f f f f f f f f f .
+          . c f f f f f f f f f f f f f .
+          . c c f f f f f f f f f f c . .
+          . . c c f f f f f f f f c f . .
+          . . . c c f f f f f c c c . . .
+          . . . . . c c c c c f . . . . .
+          . . . . . . . . . . . . . . . .
         `, SpriteKind.Bomb)
         let armedBomb = new ArmedBomb(bomb);
         bombs.insertAt(0, armedBomb)
