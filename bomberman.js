@@ -1,5 +1,6 @@
 namespace SpriteKind {
     export const Bomb = SpriteKind.create()
+    export const Explosion = SpriteKind.create()
 }
 
 class ArmedBomb {
@@ -58,22 +59,35 @@ class ArmedBomb {
         1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
     `
     bomb: Sprite
+    explosion: Explosion
     countDown: number
     status: string
     currentImage: string
+    radius: number
+    explosionBurstTime: number
 
     constructor(bomb: Sprite) {
         this.bomb = bomb
         this.countDown = 3000
+        this.explosionBurstTime = 200
         this.status = 'armed'
         this.currentImage = 'large'
-
+        this.radius = 1
     }
 
     tick() {
-      this.decreaseCountdown(10)
-      if (this.countDown % 100 == 0) {
-        this.switchImage()
+      if (this.status == 'armed') {
+        if (this.countDown % 100 == 0) {
+          this.switchImage()
+        }
+        this.decreaseCountdown(10)
+      } else if (this.status == 'exploding') {
+        this.explosionBurstTime -= 10
+        if (this.explosionBurstTime <= 0) {
+          this.bomb.destroy()
+          this.explosion.delete()
+          this.status = 'exploded'
+        }
       }
     }
 
@@ -90,14 +104,183 @@ class ArmedBomb {
     decreaseCountdown(decrease: number) {
         this.countDown -= decrease
         if (this.countDown <= 0) {
-            this.bomb.destroy()
-            this.status = 'exploded'
+            this.explosion = new Explosion(this.radius, this.bomb.x, this.bomb.y)
+            this.bomb.setImage(ArmedBomb.explodingBomb)
+            this.status = 'exploding'
         }
     }
 
     hasExploded(): boolean {
         return this.status == 'exploded'
     }
+}
+
+class ExplosionArm {
+  public static readonly explosionHorizontalPartImage = img`
+        1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+        4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+        2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+        4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+        4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+  `
+
+  public static readonly explosionVerticalPartImage = img`
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+        1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+  `
+
+  public static readonly explosionBottomTipImage = img`
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 4 2 2 2 2 4 4 4 d d 1
+          1 1 d d d 4 2 2 2 2 4 d d d 1 1
+          . 1 1 1 d 4 4 4 4 4 4 d 1 1 1 .
+          . . 1 1 d d d 4 4 d d d 1 . . .
+          . . . 1 1 1 d 4 4 d 1 1 1 . . .
+          . . . . 1 1 1 d d 1 1 . . . . .
+          . . . . . . 1 1 1 1 . . . . . .
+      `
+  public static readonly explosionUpTipImage = img`
+          . . . . . . 1 1 1 1 . . . . . .
+          . . . . 1 1 1 d d 1 1 . . . . .
+          . . . 1 1 1 d 4 4 d 1 1 1 . . .
+          . . 1 1 d d d 4 4 d d d 1 . . .
+          . 1 1 1 d 4 4 4 4 4 4 d 1 1 1 .
+          1 1 d d d 4 2 2 2 2 4 d d d 1 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 2 2 2 2 2 2 4 4 d d 1
+          1 d d 4 4 4 2 2 2 2 4 4 4 d d 1
+      `
+
+  public static readonly explosionRightTipImage = img`
+        1 1 1 1 1 1 1 1 1 1 1 . . . . .
+        d d d d d d d d d d 1 1 . . . .
+        d d d d d d d d d d d 1 . . . .
+        4 4 4 4 4 4 4 4 4 4 d 1 1 1 . .
+        4 4 4 4 4 4 4 4 4 4 d d d 1 . .
+        2 2 2 2 2 2 2 2 2 2 4 4 d 1 1 .
+        2 2 2 2 2 2 2 2 2 2 2 4 4 d 1 1
+        2 2 2 2 2 2 2 2 2 2 2 4 4 4 d 1
+        2 2 2 2 2 2 2 2 2 2 2 4 4 4 d 1
+        2 2 2 2 2 2 2 2 2 2 2 4 4 d 1 1
+        2 2 2 2 2 2 2 2 2 2 4 4 d 1 1 .
+        4 4 4 4 4 4 4 4 4 4 4 d 1 1 . .
+        4 4 4 4 4 4 4 4 4 d d d 1 1 . .
+        d d d d d d d d d d 1 1 1 . . .
+        d d d d d d d d d 1 1 . . . . .
+        1 1 1 1 1 1 1 1 1 1 1 . . . . .
+  `
+
+  public static readonly explosionLeftTipImage = img`
+        . . . . . . 1 1 1 1 1 1 1 1 1 1
+        . . . . . 1 1 d d d d d d d d d
+        . . . . 1 1 d d d d d d d d d d
+        . . 1 1 1 1 d 4 4 4 4 4 4 4 4 4
+        . . 1 1 d d d 4 4 4 4 4 4 4 4 4
+        . 1 1 d d 4 4 4 2 2 2 2 2 2 2 2
+        1 1 d d 4 4 2 2 2 2 2 2 2 2 2 2
+        1 d d 4 4 2 2 2 2 2 2 2 2 2 2 2
+        1 d d 4 4 2 2 2 2 2 2 2 2 2 2 2
+        1 1 d d 4 4 2 2 2 2 2 2 2 2 2 2
+        . 1 1 d d 4 4 2 2 2 2 2 2 2 2 2
+        . . 1 1 d d 4 4 4 4 4 4 4 4 4 4
+        . . . 1 1 d d d 4 4 4 4 4 4 4 4
+        . . . . 1 1 1 d d d d d d d d d
+        . . . . . . 1 1 d d d d d d d d
+        . . . . . . 1 1 1 1 1 1 1 1 1 1
+  `
+  tip: Sprite
+  arm: Sprite[]
+  /*
+  directions:
+    1 - up
+    2 - right
+    3 - down
+    4 - left
+  (numbers to be able to use switch case)
+  */
+  constructor(length: number, x: number, y: number, direction: number) {
+    switch(direction) {
+      case 1:
+        this.tip = sprites.create(ExplosionArm.explosionUpTipImage, SpriteKind.Explosion)
+        break
+      case 2:
+        this.tip = sprites.create(ExplosionArm.explosionRightTipImage, SpriteKind.Explosion)
+        break
+      case 3:
+        this.tip = sprites.create(ExplosionArm.explosionBottomTipImage, SpriteKind.Explosion)
+        break
+      case 4:
+        this.tip = sprites.create(ExplosionArm.explosionLeftTipImage, SpriteKind.Explosion)
+        break
+    }
+
+    this.tip.setPosition(x, y)
+  }
+
+  delete() {
+    this.tip.destroy()
+  }
+}
+
+class Explosion {
+  arms: ExplosionArm[]
+
+  constructor(radius: number, x: number, y: number) {
+    this.arms = [
+      new ExplosionArm(radius, x, y-16, 1),
+      new ExplosionArm(radius, x+16, y, 2),
+      new ExplosionArm(radius, x, y+16, 3),
+      new ExplosionArm(radius, x-16, y, 4)
+    ]
+  }
+
+  delete(){
+    for (let arm of this.arms) {
+      arm.delete()
+    }
+    this.arms = null
+  }
+
 }
 
 let bombs: ArmedBomb[] = []
