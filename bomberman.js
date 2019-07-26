@@ -22,23 +22,41 @@ class ArmedBomb {
           . . . . . . . . . . . . . . . .
   `
   public static readonly largeBombImage = img`
-      . . . . . . . . 2 2 . . . . . .
-      . . . . . . . c 4 4 . . . . . .
-      . . . c c c c c 4 c f f . . . .
-      . . c c f f f c c c c f f f . .
-      . . c f f f f c c f c d c f . .
-      . c c f f f f f f f c d d f f .
-      . c f f f f f f f f f c c f f .
-      . c f f f f f f f f f f f f f .
-      . c f f f f f f f f f f f f f .
-      . c f f f f f f f f f f f f f .
-      . c f f f f f f f f f f f f f .
-      . c c f f f f f f f f f f c . .
-      . . c c f f f f f f f f c f . .
-      . . . c c f f f f f c c c . . .
-      . . . . . c c c c c f . . . . .
-      . . . . . . . . . . . . . . . .
-  `
+        . . . . . . . . 2 2 . . . . . .
+        . . c c c c c c 4 4 f f f . . .
+        . c c f f f f c 4 c f f f f . .
+        . c f f f f f c c c c f f f . .
+        c c f f f f f c c f c d c f f .
+        c f f f f f f f f f c d d f f .
+        c f f f f f f f f f f c c f f f
+        c f f f f f f f f f f f f f f f
+        c f f f f f f f f f f f f f f f
+        c f f f f f f f f f f f f f f f
+        c f f f f f f f f f f f f f f f
+        c f f f f f f f f f f f f f c f
+        c c f f f f f f f f f f f f c .
+        . c c f f f f f f f f c c c . .
+        . . c c c f f f f f f f c c . .
+        . . . . c c c c c c . . . . . .
+    `
+    public static readonly explodingBomb = img`
+        1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+        1 1 c c c c c c c c c c c 1 1 1
+        1 c c 1 1 1 1 1 1 1 1 1 c c 1 1
+        1 c 1 1 1 1 1 1 1 1 1 1 1 c 1 1
+        1 c 1 1 1 1 1 1 1 1 1 1 1 c c 1
+        1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+        1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+        1 c c 1 1 1 1 1 1 1 1 1 1 c 1 1
+        1 1 c c c c c c c c c c c c 1 1
+        1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    `
     bomb: Sprite
     countDown: number
     status: string
