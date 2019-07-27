@@ -40,24 +40,6 @@ class ArmedBomb {
         . . c c c f f f f f f f c c . .
         . . . . c c c c c c . . . . . .
     `
-    public static readonly explodingBomb = img`
-        1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-        1 1 c c c c c c c c c c c 1 1 1
-        1 c c 1 1 1 1 1 1 1 1 1 c c 1 1
-        1 c 1 1 1 1 1 1 1 1 1 1 1 c 1 1
-        1 c 1 1 1 1 1 1 1 1 1 1 1 c c 1
-        1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
-        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
-        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
-        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
-        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
-        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
-        1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
-        1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
-        1 c c 1 1 1 1 1 1 1 1 1 1 c 1 1
-        1 1 c c c c c c c c c c c c 1 1
-        1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-    `
     bomb: Sprite
     explosion: Explosion
     countDown: number
@@ -72,7 +54,7 @@ class ArmedBomb {
         this.explosionBurstTime = 200
         this.status = 'armed'
         this.currentImage = 'large'
-        this.radius = 1
+        this.radius = 2
     }
 
     tick() {
@@ -84,7 +66,6 @@ class ArmedBomb {
       } else if (this.status == 'exploding') {
         this.explosionBurstTime -= 10
         if (this.explosionBurstTime <= 0) {
-          this.bomb.destroy()
           this.explosion.delete()
           this.status = 'exploded'
         }
@@ -105,7 +86,7 @@ class ArmedBomb {
         this.countDown -= decrease
         if (this.countDown <= 0) {
             this.explosion = new Explosion(this.radius, this.bomb.x, this.bomb.y)
-            this.bomb.setImage(ArmedBomb.explodingBomb)
+            this.bomb.destroy()
             this.status = 'exploding'
         }
     }
@@ -239,31 +220,77 @@ class ExplosionArm {
   (numbers to be able to use switch case)
   */
   constructor(length: number, x: number, y: number, direction: number) {
+    this.arm = []
     switch(direction) {
       case 1:
+        for (let i = 0; i < length - 1; i++ ) {
+          let explosionPart = sprites.create(ExplosionArm.explosionVerticalPartImage, SpriteKind.Explosion)
+          explosionPart.setPosition(x, y - (16 * i))
+          this.arm.insertAt(i, explosionPart)
+        }
         this.tip = sprites.create(ExplosionArm.explosionUpTipImage, SpriteKind.Explosion)
+        this.tip.setPosition(x, y - (16 * (length-1)))
         break
       case 2:
+        for (let i = 0; i < length - 1; i++ ) {
+          let explosionPart = sprites.create(ExplosionArm.explosionHorizontalPartImage, SpriteKind.Explosion)
+          explosionPart.setPosition(x + (16 * i), y)
+          this.arm.push(explosionPart)
+        }
         this.tip = sprites.create(ExplosionArm.explosionRightTipImage, SpriteKind.Explosion)
+        this.tip.setPosition(x + (16 * (length-1)), y)
         break
       case 3:
+        for (let i = 0; i < length - 1; i++ ) {
+          let explosionPart = sprites.create(ExplosionArm.explosionVerticalPartImage, SpriteKind.Explosion)
+          explosionPart.setPosition(x, y + (16 * i))
+          this.arm.push(explosionPart)
+        }
         this.tip = sprites.create(ExplosionArm.explosionBottomTipImage, SpriteKind.Explosion)
+        this.tip.setPosition(x, y + (16 * (length-1)))
         break
       case 4:
+        for (let i = 0; i < length - 1; i++ ) {
+          let explosionPart = sprites.create(ExplosionArm.explosionHorizontalPartImage, SpriteKind.Explosion)
+          explosionPart.setPosition(x - (16 * i), y)
+          this.arm.push(explosionPart)
+        }
         this.tip = sprites.create(ExplosionArm.explosionLeftTipImage, SpriteKind.Explosion)
+        this.tip.setPosition(x - (16 * (length-1)), y)
         break
     }
 
-    this.tip.setPosition(x, y)
   }
 
   delete() {
     this.tip.destroy()
+    for (let explosionPart of this.arm) {
+      explosionPart.destroy()
+    }
   }
 }
 
 class Explosion {
+  public static readonly explosionImage = img`
+  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+  1 1 c c c c c c c c c c c 1 1 1
+  1 c c 1 1 1 1 1 1 1 1 1 c c 1 1
+  1 c 1 1 1 1 1 1 1 1 1 1 1 c 1 1
+  1 c 1 1 1 1 1 1 1 1 1 1 1 c c 1
+  1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+  1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+  1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+  1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+  1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+  1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+  1 c 1 1 1 1 1 1 1 1 1 1 1 1 1 c
+  1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+  1 c c 1 1 1 1 1 1 1 1 1 1 c 1 1
+  1 1 c c c c c c c c c c c c 1 1
+  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+  `
   arms: ExplosionArm[]
+  core: Sprite
 
   constructor(radius: number, x: number, y: number) {
     this.arms = [
@@ -272,6 +299,8 @@ class Explosion {
       new ExplosionArm(radius, x, y+16, 3),
       new ExplosionArm(radius, x-16, y, 4)
     ]
+    this.core = sprites.create(Explosion.explosionImage, SpriteKind.Explosion)
+    this.core.setPosition(x,y)
   }
 
   delete(){
@@ -279,8 +308,8 @@ class Explosion {
       arm.delete()
     }
     this.arms = null
+    this.core.destroy()
   }
-
 }
 
 let bombs: ArmedBomb[] = []
@@ -306,6 +335,7 @@ game.onUpdateInterval(10, function () {
         }
     }
 })
+
 sprites.onCreated(SpriteKind.Bomb, function (sprite) {
     sprite.setPosition(hero.x, hero.y)
     sprite.z = hero.z - 1
