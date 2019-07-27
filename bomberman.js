@@ -1,6 +1,7 @@
 namespace SpriteKind {
     export const Bomb = SpriteKind.create()
     export const Explosion = SpriteKind.create()
+    export const Corpse = SpriteKind.create()
 }
 
 class ArmedBomb {
@@ -57,6 +58,10 @@ class ArmedBomb {
         this.radius = 2
     }
 
+    hasBombId(id: number): boolean {
+      return this.bomb.id == id
+    }
+
     tick() {
       if (this.status == 'armed') {
         if (this.countDown % 100 == 0) {
@@ -66,7 +71,6 @@ class ArmedBomb {
       } else if (this.status == 'exploding') {
         this.explosionBurstTime -= 10
         if (this.explosionBurstTime <= 0) {
-          this.explosion.delete()
           this.status = 'exploded'
         }
       }
@@ -82,12 +86,16 @@ class ArmedBomb {
       }
     }
 
+    explode() {
+      this.explosion = new Explosion(this.radius, this.bomb.x, this.bomb.y)
+      this.bomb.destroy()
+      this.status = 'exploding'
+    }
+
     decreaseCountdown(decrease: number) {
         this.countDown -= decrease
         if (this.countDown <= 0) {
-            this.explosion = new Explosion(this.radius, this.bomb.x, this.bomb.y)
-            this.bomb.destroy()
-            this.status = 'exploding'
+          this.explode()
         }
     }
 
@@ -210,7 +218,6 @@ class ExplosionArm {
         . . . . . . 1 1 1 1 1 1 1 1 1 1
   `
   tip: Sprite
-  arm: Sprite[]
   /*
   directions:
     1 - up
@@ -220,53 +227,49 @@ class ExplosionArm {
   (numbers to be able to use switch case)
   */
   constructor(length: number, x: number, y: number, direction: number) {
-    this.arm = []
     switch(direction) {
       case 1:
         for (let i = 0; i < length - 1; i++ ) {
           let explosionPart = sprites.create(ExplosionArm.explosionVerticalPartImage, SpriteKind.Explosion)
           explosionPart.setPosition(x, y - (16 * i))
-          this.arm.insertAt(i, explosionPart)
+          explosionPart.lifespan = 200
         }
         this.tip = sprites.create(ExplosionArm.explosionUpTipImage, SpriteKind.Explosion)
         this.tip.setPosition(x, y - (16 * (length-1)))
+        this.tip.lifespan = 200
         break
       case 2:
         for (let i = 0; i < length - 1; i++ ) {
           let explosionPart = sprites.create(ExplosionArm.explosionHorizontalPartImage, SpriteKind.Explosion)
           explosionPart.setPosition(x + (16 * i), y)
-          this.arm.push(explosionPart)
+          explosionPart.lifespan = 200
         }
         this.tip = sprites.create(ExplosionArm.explosionRightTipImage, SpriteKind.Explosion)
         this.tip.setPosition(x + (16 * (length-1)), y)
+        this.tip.lifespan = 200
         break
       case 3:
         for (let i = 0; i < length - 1; i++ ) {
           let explosionPart = sprites.create(ExplosionArm.explosionVerticalPartImage, SpriteKind.Explosion)
           explosionPart.setPosition(x, y + (16 * i))
-          this.arm.push(explosionPart)
+          explosionPart.lifespan = 200
         }
         this.tip = sprites.create(ExplosionArm.explosionBottomTipImage, SpriteKind.Explosion)
         this.tip.setPosition(x, y + (16 * (length-1)))
+        this.tip.lifespan = 200
         break
       case 4:
         for (let i = 0; i < length - 1; i++ ) {
           let explosionPart = sprites.create(ExplosionArm.explosionHorizontalPartImage, SpriteKind.Explosion)
           explosionPart.setPosition(x - (16 * i), y)
-          this.arm.push(explosionPart)
+          explosionPart.lifespan = 200
         }
         this.tip = sprites.create(ExplosionArm.explosionLeftTipImage, SpriteKind.Explosion)
         this.tip.setPosition(x - (16 * (length-1)), y)
+        this.tip.lifespan = 200
         break
     }
 
-  }
-
-  delete() {
-    this.tip.destroy()
-    for (let explosionPart of this.arm) {
-      explosionPart.destroy()
-    }
   }
 }
 
@@ -301,14 +304,7 @@ class Explosion {
     ]
     this.core = sprites.create(Explosion.explosionImage, SpriteKind.Explosion)
     this.core.setPosition(x,y)
-  }
-
-  delete(){
-    for (let arm of this.arms) {
-      arm.delete()
-    }
-    this.arms = null
-    this.core.destroy()
+    this.core.lifespan = 200
   }
 }
 
@@ -326,11 +322,11 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 
 game.onUpdateInterval(10, function () {
-    for (let i = 0; i < bombs.length; i++) {
-        let armedBomb = bombs[i]
+    for (let i = bombs.length; i > 0; i--) {
+        let armedBomb = bombs[i - 1]
         armedBomb.tick()
         if (armedBomb.hasExploded()) {
-            bombs.removeAt(i)
+            bombs.removeAt(i-1)
             nbAvailableBombs = nbAvailableBombs + 1
         }
     }
@@ -339,6 +335,36 @@ game.onUpdateInterval(10, function () {
 sprites.onCreated(SpriteKind.Bomb, function (sprite) {
     sprite.setPosition(hero.x, hero.y)
     sprite.z = hero.z - 1
+})
+
+sprites.onOverlap(SpriteKind.Bomb, SpriteKind.Explosion, function (bombSprite, explosion) {
+  for (let bomb of bombs) {
+    if (bomb.hasBombId(bombSprite.id)) {
+      bomb.explode()
+    }
+  }
+})
+
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Explosion, function (player, explosion) {
+  player.setKind(SpriteKind.Corpse)
+  player.setImage(img`
+    . . . . . . d d d d d . . . . .
+    . . . d d d d 1 1 1 d d d . . .
+    . . d d 1 1 1 1 1 1 1 1 d d . .
+    . . d 1 1 1 1 1 1 1 1 1 1 d . .
+    . . d 1 1 1 1 1 1 1 1 1 1 d d .
+    . d d 1 1 1 f 1 1 1 f 1 1 1 d .
+    . d 1 1 1 1 1 1 1 1 1 1 1 1 d d
+    . d 1 1 1 1 1 1 1 1 1 1 1 1 1 d
+    . d 1 1 1 1 1 1 1 1 1 1 1 1 1 d
+    d d 1 1 1 1 1 1 f f 1 1 1 1 1 d
+    d 1 1 1 1 1 1 1 f f 1 1 1 1 1 d
+    d 1 1 1 1 1 1 1 1 1 1 1 1 1 1 d
+    d 1 1 1 1 1 1 1 d 1 1 1 1 1 1 d
+    d 1 d d d 1 1 d d d d 1 d 1 1 d
+    d d d . d d d d . . d d d d d d
+    d d . . . d d . . . . d . . d d
+  `)
 })
 
 scene.setBackgroundColor(6)
@@ -361,4 +387,5 @@ hero = sprites.create(img`
     . . . . . f f . . f f . . . . .
 `, SpriteKind.Player)
 controller.moveSprite(hero, 200, 200)
+hero.setFlag(SpriteFlag.StayInScreen, true)
 nbAvailableBombs = 2
