@@ -321,20 +321,40 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     }
 })
 
+function alignPlayerWithHorizontalGrid(player: Sprite) {
+    for (let position = player.x - 3; position < player.x + 3; position++) {
+        if (position % 16 == 0) {
+            player.setPosition(position, player.y)
+        }
+    }
+}
+
+function alignPlayerWithVerticalGrid(player: Sprite) {
+    for (let position = player.y - 3; position < player.y + 3; position++) {
+        if (position % 16 == 0) {
+            player.setPosition(player.x, position)
+        }
+    }
+}
+
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
   hero.setImage(PLAYER_BACK_IMAGE)
+  alignPlayerWithHorizontalGrid(hero)
 })
 
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
   hero.setImage(PLAYER_FRONT_IMAGE)
+  alignPlayerWithHorizontalGrid(hero)
 })
 
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
   hero.setImage(PLAYER_RIGHT_IMAGE)
+  alignPlayerWithVerticalGrid(hero)
 })
 
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
   hero.setImage(PLAYER_LEFT_IMAGE)
+  alignPlayerWithVerticalGrid(hero)
 })
 
 game.onUpdateInterval(10, function () {
