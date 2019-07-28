@@ -309,7 +309,7 @@ class Explosion {
 }
 
 let bombs: ArmedBomb[] = []
-let nbAvailableBombs = 0
+let nbAvailableBombs = 2
 let hero: Sprite = null
 
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
@@ -319,6 +319,22 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         let armedBomb = new ArmedBomb(bomb);
         bombs.insertAt(0, armedBomb)
     }
+})
+
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+  hero.setImage(PLAYER_BACK_IMAGE)
+})
+
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+  hero.setImage(PLAYER_FRONT_IMAGE)
+})
+
+controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
+  hero.setImage(PLAYER_RIGHT_IMAGE)
+})
+
+controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
+  hero.setImage(PLAYER_LEFT_IMAGE)
 })
 
 game.onUpdateInterval(10, function () {
@@ -366,9 +382,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Explosion, function (player, exp
     d d . . . d d . . . . d . . d d
   `)
 })
-
-scene.setBackgroundColor(6)
-hero = sprites.create(img`
+const PLAYER_FRONT_IMAGE = img`
     . . . . . . f f f f . . . . . .
     . . . . f f f 2 2 f f f . . . .
     . . . f f f 2 2 2 2 f f f . . .
@@ -385,7 +399,64 @@ hero = sprites.create(img`
     . . 4 4 f 4 4 5 5 4 4 f 4 4 . .
     . . . . . f f f f f f . . . . .
     . . . . . f f . . f f . . . . .
-`, SpriteKind.Player)
+`
+const PLAYER_BACK_IMAGE = img`
+    . . . . . . f f f f . . . . . .
+    . . . . f f e e e e f f . . . .
+    . . . f e e e f f e e e f . . .
+    . . f f f f f 2 2 f f f f f . .
+    . . f f e 2 e 2 2 e 2 e f f . .
+    . . f e 2 f 2 f f 2 f 2 e f . .
+    . . f f f 2 2 e e 2 2 f f f . .
+    . f f e f 2 f e e f 2 f e f f .
+    . f e e f f e e e e f e e e f .
+    . . f e e e e e e e e e e f . .
+    . . . f e e e e e e e e f . . .
+    . . e 4 f f f f f f f f 4 e . .
+    . . 4 d f 2 2 2 2 2 2 f d 4 . .
+    . . 4 4 f 4 4 4 4 4 4 f 4 4 . .
+    . . . . . f f f f f f . . . . .
+    . . . . . f f . . f f . . . . .
+`
+
+const PLAYER_RIGHT_IMAGE = img`
+    . . . . . . . . . . . . . . . .
+    . . . . . f f f f f f . . . . .
+    . . . f f e e e e f 2 f . . . .
+    . . f f e e e e f 2 2 2 f . . .
+    . . f e e e f f e e e e f . . .
+    . . f f f f e e 2 2 2 2 e f . .
+    . . f e 2 2 2 f f f f e 2 f . .
+    . f f f f f f f e e e f f f . .
+    . f f e 4 4 e b f 4 4 e e f . .
+    . f e e 4 d 4 1 f d d e f . . .
+    . . f e e e e e d d d f . . . .
+    . . . . f 4 d d e 4 e f . . . .
+    . . . . f e d d e 2 2 f . . . .
+    . . . f f f e e f 5 5 f f . . .
+    . . . f f f f f f f f f f . . .
+    . . . . f f . . . f f f . . . .
+`
+
+const PLAYER_LEFT_IMAGE = img`
+    . . . . . . . . . . . . . . . .
+    . . . . f f f f f f . . . . . .
+    . . . f 2 f e e e e f f . . . .
+    . . f 2 2 2 f e e e e f f . . .
+    . . f e e e e f f e e e f . . .
+    . f e 2 2 2 2 e e f f f f . . .
+    . f 2 e f f f f 2 2 2 e f . . .
+    . f f f e e e f f f f f f f . .
+    . f e e 4 4 f b e 4 4 e f f . .
+    . . f e d d f 1 4 d 4 e e f . .
+    . . . f d d d e e e e e f . . .
+    . . . f e 4 e d d 4 f . . . . .
+    . . . f 2 2 e d d e f . . . . .
+    . . f f 5 5 f e e f f f . . . .
+    . . f f f f f f f f f f . . . .
+    . . . f f f . . . f f . . . . .
+`
+scene.setBackgroundColor(6)
+hero = sprites.create(PLAYER_FRONT_IMAGE, SpriteKind.Player)
 controller.moveSprite(hero, 200, 200)
 hero.setFlag(SpriteFlag.StayInScreen, true)
-nbAvailableBombs = 2
