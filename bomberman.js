@@ -323,40 +323,40 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     }
 })
 
-function alignPlayerWithHorizontalGrid(player: Sprite) {
-    for (let position = player.x - 3; position < player.x + 3; position++) {
+function alignObjectWithHorizontalGrid(object: Sprite, correctionSpan: number = 3) {
+    for (let position = object.x - correctionSpan; position < object.x + correctionSpan; position++) {
         if (position % 16 == 0) {
-            player.setPosition(position, player.y)
+            object.setPosition(position, object.y)
         }
     }
 }
 
-function alignPlayerWithVerticalGrid(player: Sprite) {
-    for (let position = player.y - 3; position < player.y + 3; position++) {
+function alignObjectWithVerticalGrid(object: Sprite, correctionSpan: number = 3) {
+    for (let position = object.y - correctionSpan; position < object.y + correctionSpan; position++) {
         if (position % 16 == 0) {
-            player.setPosition(player.x, position)
+            object.setPosition(object.x, position)
         }
     }
 }
 
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
   hero.setImage(PLAYER_BACK_IMAGE)
-  alignPlayerWithHorizontalGrid(hero)
+  alignObjectWithHorizontalGrid(hero)
 })
 
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
   hero.setImage(PLAYER_FRONT_IMAGE)
-  alignPlayerWithHorizontalGrid(hero)
+  alignObjectWithHorizontalGrid(hero)
 })
 
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
   hero.setImage(PLAYER_RIGHT_IMAGE)
-  alignPlayerWithVerticalGrid(hero)
+  alignObjectWithVerticalGrid(hero)
 })
 
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
   hero.setImage(PLAYER_LEFT_IMAGE)
-  alignPlayerWithVerticalGrid(hero)
+  alignObjectWithVerticalGrid(hero)
 })
 
 game.onUpdateInterval(10, function () {
@@ -372,6 +372,8 @@ game.onUpdateInterval(10, function () {
 
 sprites.onCreated(SpriteKind.Bomb, function (sprite) {
     sprite.setPosition(hero.x, hero.y)
+    alignObjectWithVerticalGrid(sprite, 7)
+    alignObjectWithHorizontalGrid(sprite, 7)
     sprite.z = hero.z - 1
 })
 
