@@ -2,6 +2,7 @@ namespace SpriteKind {
     export const Bomb = SpriteKind.create()
     export const Explosion = SpriteKind.create()
     export const Corpse = SpriteKind.create()
+    export const BrickWall = SpriteKind.create()
 }
 
 class ArmedBomb {
@@ -311,6 +312,7 @@ class Explosion {
 let bombs: ArmedBomb[] = []
 let nbAvailableBombs = 2
 let hero: Sprite = null
+let wall: Sprite = null
 
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     if (nbAvailableBombs > 0) {
@@ -402,6 +404,50 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Explosion, function (player, exp
     d d . . . d d . . . . d . . d d
   `)
 })
+
+sprites.onOverlap(SpriteKind.BrickWall, SpriteKind.Explosion, function (wall, explosion) {
+  wall.setImage(EXPLODING_BRICK_WALL_IMAGE)
+  wall.lifespan = 100
+})
+
+const BRICK_WALL_IMAGE = img`
+    f f f f f f f f f f f f f f f f
+    d d d d d d d f d d d d d d d d
+    d d d d d d d f d d d d d d d d
+    d d d d d d d f d d d d d d d d
+    f f f f f f f f f f f f f f f f
+    d d d f d d d d d d d d f d d d
+    d d d f d d d d d d d d f d d d
+    d d d f d d d d d d d d f d d d
+    f f f f f f f f f f f f f f f f
+    d d d d d d d f d d d d d d d d
+    d d d d d d d f d d d d d d d d
+    d d d d d d d f d d d d d d d d
+    f f f f f f f f f f f f f f f f
+    d d d f d d d d d d d d f d d d
+    d d d f d d d d d d d d f d d d
+    d d d f d d d d d d d d f d d d
+`
+
+const EXPLODING_BRICK_WALL_IMAGE = img`
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    2 2 2 2 2 2 1 1 2 2 2 2 2 2 2 2
+    2 2 2 2 2 2 1 1 2 2 2 2 2 2 2 2
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    2 2 1 1 2 2 2 2 2 2 2 1 1 2 2 2
+    2 2 1 1 2 2 2 2 2 2 2 1 1 2 2 2
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    2 2 2 2 2 2 1 1 2 2 2 2 2 2 2 2
+    2 2 2 2 2 2 1 1 2 2 2 2 2 2 2 2
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    2 2 1 1 2 2 2 2 2 2 2 1 1 2 2 2
+    2 2 1 1 2 2 2 2 2 2 2 1 1 2 2 2
+`
+
 const PLAYER_FRONT_IMAGE = img`
     . . . . . . f f f f . . . . . .
     . . . . f f f 2 2 f f f . . . .
@@ -480,3 +526,5 @@ scene.setBackgroundColor(6)
 hero = sprites.create(PLAYER_FRONT_IMAGE, SpriteKind.Player)
 controller.moveSprite(hero, 200, 200)
 hero.setFlag(SpriteFlag.StayInScreen, true)
+wall = sprites.create(BRICK_WALL_IMAGE, SpriteKind.BrickWall)
+wall.setPosition(32, 32)
