@@ -407,6 +407,29 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Explosion, function (player, exp
   `)
 })
 
+let xStoppedAt: number
+let yStoppedAt: number
+sprites.onOverlap(SpriteKind.Player, SpriteKind.BrickWall, function (player, wall) {
+    if (player.vx != 0) {
+        xStoppedAt = wall.x - (16 * Math.abs(player.vx) / player.vx)
+        player.vx = 0
+        yStoppedAt = null
+        player.x = xStoppedAt
+    } if (player.vy != 0) {
+        yStoppedAt = wall.y - (16 * Math.abs(player.vy) / player.vy)
+        player.vy = 0
+        player.y = yStoppedAt
+        xStoppedAt = null
+    } if (player.x + 16 > wall.x && player.x < wall.x + 16 ||
+        player.y + 16 > wall.y && player.y < wall.y + 16) {
+        if (xStoppedAt !== null) {
+            player.x = xStoppedAt
+        } else if (yStoppedAt !== null) {
+            player.y = yStoppedAt
+        }
+    }
+})
+
 sprites.onOverlap(SpriteKind.BrickWall, SpriteKind.Explosion, function (wall, explosion) {
   wall.setImage(EXPLODING_BRICK_WALL_IMAGE)
   wall.lifespan = 100
